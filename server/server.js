@@ -1,6 +1,8 @@
 
 require("dotenv").config();
+const dns = require("dns");
 
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -16,10 +18,11 @@ const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
-// Middleware
+// CORS Configuration
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  "https://wearloop-two.vercel.app",
   "http://localhost:5173",
+  process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(
@@ -28,12 +31,15 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
+    credentials: true,
   })
 );
 
+// Middleware
 app.use(express.json());
 
 // API Routes
